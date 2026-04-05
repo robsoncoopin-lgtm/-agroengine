@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>AgroEngine — Seu Agrônomo Digital</title>
+<meta name="description" content="Do vaso ao hectare — Scanner de doenças, Calendário fenológico, Calculadora de defensivos e muito mais.">
+<meta name="theme-color" content="#0E1A0F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AgroEngine">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,900;1,600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0E1A0F;--bg2:#152016;--bg3:#1C2B1D;--br:rgba(143,191,90,.13);--br2:rgba(255,255,255,.07);--g:#7DBF4A;--g2:#A8D875;--g3:#3D6B25;--go:#C9943A;--go2:#E8B85A;--re:#D95757;--bl:#4A90D9;--t:#E8F0DC;--t2:#9DB88A;--t3:#5A7A4A;--w:#F5F9EE}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;max-width:480px;margin:0 auto;min-height:100vh;overflow-x:hidden}
+/* screens */
+.s{display:none;flex-direction:column;min-height:100vh;padding-bottom:82px;animation:fi .3s ease}
+.s.on{display:flex}
+@keyframes fi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+/* topbar */
+.tb{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px;position:sticky;top:0;z-index:40;background:linear-gradient(to bottom,var(--bg) 65%,transparent)}
+.logo{font-family:'Fraunces',serif;font-size:1.25rem;font-weight:900;color:var(--w);letter-spacing:-.02em}
+.logo em{color:var(--g);font-style:italic}
+.bk{background:none;border:none;color:var(--t2);font-size:.82rem;font-family:'DM Sans',sans-serif;cursor:pointer;padding:0}
+/* layout */
+.px{padding:0 16px}
+.h1{font-family:'Fraunces',serif;font-size:1.55rem;font-weight:900;color:var(--w);line-height:1.15;margin-bottom:6px}
+.h1 em{color:var(--g);font-style:italic}
+.sub{font-size:.82rem;color:var(--t2);line-height:1.55;margin-bottom:16px}
+/* forms */
+.fg{margin-bottom:14px}
+.fl{font-size:.68rem;color:var(--t2);margin-bottom:5px;display:block;letter-spacing:.05em;text-transform:uppercase}
+.fi,.fs{width:100%;background:var(--bg3);border:1px solid var(--br2);border-radius:11px;padding:11px 13px;color:var(--w);font-family:'DM Sans',sans-serif;font-size:.88rem;appearance:none;outline:none}
+.fi:focus,.fs:focus{border-color:var(--g)}
+.fs option{background:var(--bg3)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+/* search */
+.sw{position:relative}
+.sc{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:.9rem;display:none}
+.sr{background:var(--bg3);border:1px solid var(--br);border-radius:11px;margin-top:3px;max-height:190px;overflow-y:auto;display:none}
+.sr.on{display:block}
+.si{padding:10px 13px;cursor:pointer;font-size:.85rem;color:var(--t);border-bottom:1px solid var(--br2);display:flex;align-items:center;gap:9px}
+.si:last-child{border:none}
+.si:active{background:rgba(125,191,74,.12)}
+.sn{font-size:.83rem;color:var(--w);font-weight:500}
+.ss{font-size:.68rem;font-style:italic;color:var(--t3)}
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.72rem;padding:6px 11px;border-radius:9px;background:var(--bg3);color:var(--t2);border:1px solid var(--br2);cursor:pointer}
+.chip.on{background:rgba(125,191,74,.15);color:var(--g);border-color:rgba(125,191,74,.4)}
+/* buttons */
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.93rem;font-weight:500;cursor:pointer;margin-top:4px}
+.bp{background:var(--g);color:var(--bg)}
+.bs{background:var(--bg3);color:var(--t);border:1px solid var(--br);margin-top:8px}
+.bsm{padding:7px 13px;border-radius:9px;font-size:.74rem;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
+.bg-g{background:rgba(125,191,74,.15);color:var(--g)}
+.bg-go{background:rgba(201,148,58,.15);color:var(--go2)}
+/* cards */
+.card{background:var(--bg2);border:1px solid var(--br2);border-radius:14px;padding:15px;margin-bottom:10px}
+.cl{font-size:.63rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
+/* tags */
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:7px;font-size:.68rem;font-weight:500;margin-right:4px;margin-bottom:4px}
+.tg{background:rgba(125,191,74,.15);color:var(--g)}
+.tgo{background:rgba(201,148,58,.15);color:var(--go2)}
+.tr{background:rgba(217,87,87,.15);color:var(--re)}
+.tb2{background:rgba(74,144,217,.15);color:var(--bl)}
+/* dual result */
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.rc{border-radius:12px;padding:12px}
+.rco{background:rgba(61,107,37,.2);border:1px solid rgba(125,191,74,.25)}
+.rcq{background:rgba(201,148,58,.1);border:1px solid rgba(201,148,58,.25)}
+.rcl{font-size:.6rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.rco .rcl{color:var(--g)}
+.rcq .rcl{color:var(--go2)}
+.rc p{font-size:.77rem;color:var(--t);line-height:1.55}
+/* detail */
+.dp{background:rgba(61,107,37,.1);border:1px solid rgba(125,191,74,.2);border-radius:12px;padding:13px;margin-top:10px}
+.dp h4{font-size:.7rem;color:var(--g);font-weight:500;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.dp p,.dp li{font-size:.8rem;color:var(--t2);line-height:1.55}
+.dp ul{padding-left:14px}
+/* alert */
+.ab{margin:0 16px 12px;border-radius:12px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.aw{background:rgba(201,148,58,.12);border:1px solid rgba(201,148,58,.25)}
+.at{font-size:.82rem;font-weight:500;color:var(--w);margin-bottom:2px}
+.ad{font-size:.73rem;color:var(--t2);line-height:1.4}
+/* loading */
+.ld{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:44px 16px;text-align:center}
+.lr{width:44px;height:44px;border-radius:50%;border:3px solid var(--bg3);border-top-color:var(--g);animation:sp .9s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ld p{font-size:.83rem;color:var(--t2);line-height:1.55}
+/* plants */
+.pi{display:flex;align-items:center;gap:11px;background:var(--bg2);border:1px solid var(--br2);border-radius:12px;padding:12px;margin-bottom:7px;cursor:pointer;position:relative}
+.pi.ex{border-color:var(--g);background:rgba(125,191,74,.04)}
+.pe{font-size:1.6rem}
+.pn{font-size:.85rem;font-weight:500;color:var(--w)}
+.pd{font-size:.7rem;color:var(--t2);margin-top:1px}
+.pst{font-size:.63rem;padding:2px 7px;border-radius:5px}
+.pok{background:rgba(125,191,74,.15);color:var(--g)}
+.pwn{background:rgba(201,148,58,.15);color:var(--go2)}
+.pnw{background:rgba(74,144,217,.15);color:var(--bl)}
+.pex{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--br2)}
+.pi.ex .pex{display:block;animation:fi .2s ease}
+.pdel{position:absolute;top:7px;right:7px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:.85rem;padding:2px 5px}
+.qa{display:flex;gap:7px;margin-top:10px}
+.qb{flex:1;background:var(--bg3);border:1px solid var(--br2);border-radius:9px;padding:8px 4px;cursor:pointer;text-align:center}
+.qi{font-size:1rem}
+.ql{font-size:.58rem;color:var(--t2);display:block;margin-top:2px}
+/* soil pills */
+.soilrow{display:flex;gap:7px;margin-bottom:10px}
+.sp2{flex:1;background:var(--bg3);border:1px solid var(--br2);border-radius:9px;padding:9px 6px;text-align:center}
+.sp2.ok{border-color:rgba(125,191,74,.3);background:rgba(125,191,74,.06)}
+.sp2.wn{border-color:rgba(201,148,58,.3);background:rgba(201,148,58,.06)}
+.spv{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:var(--w)}
+.spl{font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+/* timeline */
+.tl{padding-left:13px}
+.ti{position:relative;padding:0 0 16px 17px;border-left:2px solid var(--br)}
+.ti::before{content:'';position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--g)}
+.ti:last-child{border-left-color:transparent}
+.tw{font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.tt{font-size:.81rem;color:var(--t);line-height:1.45}
+/* modules grid */
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 16px 16px}
+.mc{background:var(--bg2);border:1px solid var(--br2);border-radius:14px;padding:15px 12px;cursor:pointer;transition:border-color .2s;position:relative}
+.mc:active{border-color:var(--g)}
+.mc.full{grid-column:1/-1}
+.mi{font-size:1.65rem;margin-bottom:8px}
+.mn{font-size:.81rem;font-weight:500;color:var(--w);line-height:1.3;margin-bottom:2px}
+.md{font-size:.68rem;color:var(--t2);line-height:1.35}
+.mb{position:absolute;top:8px;right:8px;font-size:.5rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:rgba(201,148,58,.15);color:var(--go2)}
+/* inno scroll */
+.inscroll{display:flex;gap:9px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none}
+.inscroll::-webkit-scrollbar{display:none}
+.inc{background:var(--bg2);border:1px solid var(--br2);border-radius:13px;padding:14px;min-width:140px;cursor:pointer;flex-shrink:0}
+.inc:active{border-color:var(--g)}
+.ini{font-size:1.5rem;margin-bottom:7px}
+.inn{font-size:.77rem;font-weight:500;color:var(--w);line-height:1.3}
+.ind{font-size:.65rem;color:var(--t2);margin-top:2px;line-height:1.35}
+/* stats */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 14px}
+.stc{background:var(--bg2);border:1px solid var(--br2);border-radius:12px;padding:12px;cursor:pointer}
+.stl{font-size:.67rem;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.stv{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;color:var(--w)}
+/* navbar */
+.nb{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(14,26,15,.95);backdrop-filter:blur(16px);border-top:1px solid var(--br);display:flex;justify-content:space-around;align-items:center;padding:8px 0 14px;z-index:100}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:3px 10px;border:none;background:none}
+.nic{font-size:1.2rem}
+.nil{font-size:.56rem;color:var(--t3);font-weight:500;letter-spacing:.05em}
+.ni.on .nil{color:var(--g)}
+.ni.on .nic{filter:drop-shadow(0 0 5px var(--g))}
+/* onboarding */
+#s-onb{justify-content:center;align-items:center;padding-bottom:0}
+.ow{width:100%;padding:32px 20px 50px}
+.olog{font-family:'Fraunces',serif;font-size:2.5rem;font-weight:900;color:var(--w);letter-spacing:-.03em;margin-bottom:3px}
+.olog em{color:var(--g);font-style:italic}
+.osg{font-size:.85rem;color:var(--t2);margin-bottom:32px}
+.ost{display:none}
+.ost.on{display:block;animation:fi .3s ease}
+.oq{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;color:var(--w);line-height:1.2;margin-bottom:4px}
+.osb{font-size:.8rem;color:var(--t2);margin-bottom:18px}
+.oo{background:var(--bg3);border:1px solid var(--br);border-radius:12px;padding:13px 15px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.oo.on,.oo:active{background:rgba(125,191,74,.12);border-color:var(--g)}
+.oi{font-size:1.45rem;min-width:28px}
+.ot{font-size:.9rem;font-weight:500;color:var(--w)}
+.od{font-size:.7rem;color:var(--t2);margin-top:1px}
+.op{display:flex;gap:5px;margin-bottom:22px}
+.dot{height:3px;flex:1;border-radius:2px;background:var(--bg3)}
+.dot.dn{background:var(--g)}
+.onxt{width:100%;margin-top:16px;background:var(--g);color:var(--bg);border:none;border-radius:12px;padding:14px;font-family:'DM Sans',sans-serif;font-size:.93rem;font-weight:500;cursor:pointer}
+.onxt:disabled{opacity:.35;cursor:not-allowed}
+/* upload area */
+.ua{border:2px dashed var(--br);border-radius:13px;padding:28px 16px;text-align:center;cursor:pointer;background:var(--bg2);display:flex;flex-direction:column;align-items:center;gap:5px}
+.ua:active{border-color:var(--g)}
+/* toast */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--g);border-radius:10px;padding:9px 16px;font-size:.8rem;color:var(--w);z-index:200;white-space:nowrap;pointer-events:none;max-width:90%;animation:fi .3s ease}
+/* alert items */
+.ai{display:flex;gap:11px;background:var(--bg2);border:1px solid var(--br2);border-radius:12px;padding:12px;margin-bottom:8px}
+.asv{width:5px;border-radius:3px;align-self:stretch;min-height:36px}
+.asr{background:var(--re)}
+.aso{background:var(--go)}
+.asg{background:var(--g)}
+.an{font-size:.84rem;font-weight:500;color:var(--w)}
+.adb{font-size:.75rem;color:var(--t2);line-height:1.4;margin-top:2px}
+/* home tags */
+.htag{font-size:.62rem;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--t3);border:1px solid var(--br2);display:inline-block;margin:2px}
+/* camera grid */
+.camgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.cambtn{border:none;border-radius:12px;padding:16px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:'DM Sans',sans-serif}
+.cambg{background:linear-gradient(135deg,var(--g3),var(--g));color:var(--bg)}
+.cambg2{background:var(--bg3);border:1px solid var(--br2);color:var(--t)}
+.cambg2:active{border-color:var(--g)}
+.cai{font-size:1.7rem}
+.can{font-size:.8rem;font-weight:500}
+.cas{font-size:.63rem;opacity:.7}
+/* preview */
+#prev-img{width:100%;border-radius:10px;max-height:180px;object-fit:cover;margin-bottom:10px}
+/* diary */
+.ditem{background:var(--bg2);border:1px solid var(--br2);border-radius:12px;padding:12px;margin-bottom:7px}
+.ddt{font-size:.65rem;color:var(--t3);margin-bottom:4px}
+.dtx{font-size:.81rem;color:var(--t);line-height:1.5}
+/* recipe card */
+.rec{background:var(--bg2);border:1px solid var(--br2);border-radius:12px;padding:14px;margin-bottom:9px;cursor:pointer}
+.rec:active{border-color:var(--g)}
+/* season */
+.season{margin:0 16px 12px;display:flex;align-items:center;gap:9px;background:rgba(201,148,58,.07);border:1px solid rgba(201,148,58,.18);border-radius:11px;padding:10px 12px}
+.seai{font-size:1.1rem}
+.seat{font-size:.76rem;color:var(--t2);line-height:1.4}
+/* weather */
+.ww{margin:0 16px 12px;background:linear-gradient(135deg,rgba(43,122,184,.13),rgba(61,107,37,.08));border:1px solid rgba(74,144,217,.18);border-radius:13px;padding:13px;display:flex;align-items:center;justify-content:space-between}
+.wt{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--w)}
+.wd{font-size:.73rem;color:var(--t2);margin-top:1px}
+.ws{text-align:center}
+.wsv{font-size:.86rem;font-weight:600;color:var(--w)}
+.wsl{font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.05em}
+/* home hero */
+.hh{padding:4px 16px 16px}
+.hg{font-size:.73rem;color:var(--t2);margin-bottom:2px}
+.hn{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:600;color:var(--w);line-height:1.15}
+.hn em{font-style:italic;color:var(--g)}
+.hbadge{display:inline-flex;align-items:center;gap:4px;background:rgba(125,191,74,.1);border:1px solid var(--br);border-radius:18px;padding:3px 10px;margin-top:8px;font-size:.71rem;color:var(--g2)}
+/* profile header */
+.ph{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--br);border-radius:15px;padding:16px;margin-bottom:13px;text-align:center}
+.pav{font-size:2.6rem;margin-bottom:6px}
+.pnm{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--w)}
+.pty{font-size:.76rem;color:var(--g);margin-top:2px}
+/* add plant form */
+#apf{display:none}
+/* moon */
+.moon{margin:0 16px 11px;display:flex;align-items:center;gap:10px;background:rgba(74,144,217,.08);border:1px solid rgba(74,144,217,.15);border-radius:11px;padding:11px 13px}
+.moone{font-size:1.6rem}
+.moonp{font-size:.82rem;font-weight:500;color:var(--w)}
+.moona{font-size:.71rem;color:var(--t2);margin-top:2px;line-height:1.4}
+/* hidro sys chips */
+.hsc{display:flex;flex-direction:column;gap:7px}
+.hsc .chip{padding:11px 13px;text-align:left}
+/* section title */
+.st{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.st h2{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--w)}
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="s-onb" class="s on">
+<div class="ow">
+  <div class="olog">Agro<em>Engine</em></div>
+  <div class="osg">Seu agrônomo digital — do vaso ao hectare</div>
+  <div class="op"><div class="dot dn" id="d0"></div><div class="dot" id="d1"></div><div class="dot" id="d2"></div></div>
+
+  <div class="ost on" id="os0">
+    <div class="oq">Como você cultiva?</div>
+    <div class="osb">Escolha o que melhor te descreve</div>
+    <div class="oo" data-v="hobby" onclick="selO(this,0)"><div class="oi">🏠</div><div><div class="ot">Hobbista / Casa</div><div class="od">Vasos, horta, jardim, apartamento</div></div></div>
+    <div class="oo" data-v="flori" onclick="selO(this,0)"><div class="oi">🌸</div><div><div class="ot">Floricultura</div><div class="od">Produção de flores e ornamentais</div></div></div>
+    <div class="oo" data-v="peq" onclick="selO(this,0)"><div class="oi">🌿</div><div><div class="ot">Pequeno Agricultor</div><div class="od">Até 4 módulos fiscais / família</div></div></div>
+    <div class="oo" data-v="grande" onclick="selO(this,0)"><div class="oi">🚜</div><div><div class="ot">Produtor / Fazendeiro</div><div class="od">Grande escala, commodities</div></div></div>
+    <button class="onxt" id="b0" disabled onclick="goO(1)">Continuar →</button>
+  </div>
+
+  <div class="ost" id="os1">
+    <div class="oq">Quais seus focos?</div>
+    <div class="osb">Selecione quantos quiser</div>
+    <div id="fcs">
+      <div class="oo" data-v="frutas" onclick="togF(this)"><div class="oi">🍎</div><div><div class="ot">Frutíferas</div><div class="od">Árvores e arbustos frutíferos</div></div></div>
+      <div class="oo" data-v="horta" onclick="togF(this)"><div class="oi">🥬</div><div><div class="ot">Hortaliças / Verduras</div><div class="od">Ciclo curto, mesa e venda</div></div></div>
+      <div class="oo" data-v="flores" onclick="togF(this)"><div class="oi">🌺</div><div><div class="ot">Flores / Ornamentais</div><div class="od">Corte, vaso, paisagismo</div></div></div>
+      <div class="oo" data-v="ervas" onclick="togF(this)"><div class="oi">🌿</div><div><div class="ot">Ervas / Temperos / Medicinais</div><div class="od">Manjericão, alecrim, boldo...</div></div></div>
+      <div class="oo" data-v="saf" onclick="togF(this)"><div class="oi">🌳</div><div><div class="ot">Agrofloresta / SAF</div><div class="od">Sistemas biodiversos e sintropicos</div></div></div>
+      <div class="oo" data-v="hidro" onclick="togF(this)"><div class="oi">💧</div><div><div class="ot">Hidroponia / Estufa</div><div class="od">Ambiente controlado, NFT, DWC</div></div></div>
+    </div>
+    <button class="onxt" id="b1" disabled onclick="goO(2)">Continuar →</button>
+    <button class="btn bs" onclick="goO(0)" style="margin-top:7px">← Voltar</button>
+  </div>
+
+  <div class="ost" id="os2">
+    <div class="oq">Qual o seu nome?</div>
+    <div class="osb">Para personalizar o seu painel</div>
+    <div class="fg"><input type="text" class="fi" id="uname" placeholder="Ex: Carlos, Dona Maria..." oninput="chkN()"></div>
+    <button class="onxt" id="b2" disabled onclick="finO()">Entrar no App 🌱</button>
+    <button class="btn bs" onclick="goO(1)" style="margin-top:7px">← Voltar</button>
+  </div>
+</div>
+</div>
+
+<!-- HOME -->
+<div id="s-home" class="s">
+  <div class="tb"><div class="logo">Agro<em>Engine</em></div><div style="font-size:1.4rem" id="hav">🌱</div></div>
+  <div class="hh">
+    <div class="hg">Olá,</div>
+    <div class="hn" id="hnm">Bem-vindo ao <em>campo</em></div>
+    <div class="hbadge" id="hbdg">🏠 Hobbista</div>
+    <div id="hftags" style="margin-top:7px"></div>
+  </div>
+  <div class="ww">
+    <div><div class="wt">☁️ 24°C</div><div class="wd">Parcialmente nublado</div><div style="font-size:.66rem;color:var(--t3)">📍 Sua região</div></div>
+    <div style="display:flex;gap:14px"><div class="ws"><div class="wsv" style="color:var(--bl)">81%</div><div class="wsl">Umidade</div></div><div class="ws"><div class="wsv" style="color:var(--go2)">14km/h</div><div class="wsl">Vento</div></div></div>
+  </div>
+  <div class="moon"><div class="moone">🌒</div><div><div class="moonp">Lua Crescente</div><div class="moona">Bom para plantio de folhosas. Evite podas hoje.</div></div></div>
+  <div class="ab aw" onclick="G('alertas')"><div style="font-size:1.1rem">⚠️</div><div class="flex1"><div class="at">Alerta Climático Ativo</div><div class="ad">Umidade 81% + chuva prevista — risco de fungo em tomateiro e roseiras</div></div></div>
+  <div class="season"><div class="seai">🍂</div><div class="seat"><strong style="color:var(--go2)">Outono</strong> — Época de poda de frutíferas, plantio de alho. Adubar com P e K.</div></div>
+  <div class="stats">
+    <div class="stc" onclick="G('perfil')"><div class="stl">Minhas Plantas</div><div class="stv" id="stp" style="color:var(--g)">3</div></div>
+    <div class="stc" onclick="G('diario')"><div class="stl">Diário do Campo</div><div class="stv" style="font-size:.88rem;color:var(--go2)">Ver →</div></div>
+  </div>
+  <div class="px"><div class="st"><h2>Módulos</h2></div></div>
+  <div class="mg">
+    <div class="mc full" onclick="G('scanner')"><div class="mb">🤖 IA</div><div class="mi">🔬</div><div class="mn">Scanner de Folha</div><div class="md">Foto → identifica planta e diagnóstico preciso</div></div>
+    <div class="mc" onclick="G('dosagem')"><div class="mi">⚗️</div><div class="mn">Calculadora Defensivos</div><div class="md">Orgânico e químico</div></div>
+    <div class="mc" onclick="G('alertas')"><div class="mi">🌩️</div><div class="mn">Alertas Climáticos</div><div class="md">Pragas por clima</div></div>
+    <div class="mc full" onclick="G('calendario')"><div class="mi">🗓️</div><div class="mn">Calendário Fenológico</div><div class="md">Do plantio à colheita — passo a passo</div></div>
+  </div>
+  <div class="px"><div class="st"><h2>🚀 Exclusivo</h2></div></div>
+  <div class="inscroll">
+    <div class="inc" onclick="G('diario')"><div class="ini">📔</div><div class="inn">Diário do Campo</div><div class="ind">Registre observações e eventos</div></div>
+    <div class="inc" onclick="G('laudosolo')"><div class="ini">🧪</div><div class="inn">Laudo de Solo</div><div class="ind">Foto do laudo → adubação</div></div>
+    <div class="inc" onclick="G('bioinsumos')"><div class="ini">🫙</div><div class="inn">Bioinsumos</div><div class="ind">Caldas e receitas orgânicas</div></div>
+    <div class="inc" onclick="G('hidro')"><div class="ini">💧</div><div class="inn">Hidroponia</div><div class="ind">NFT, DWC, vertical farming</div></div>
+  </div>
+</div>
+
+<!-- SCANNER -->
+<div id="s-scanner" class="s">
+  <div class="tb"><button class="bk" onclick="GB()">← Voltar</button><div class="logo">🔬 Scanner</div><div style="width:55px"></div></div>
+  <div class="px">
+    <div class="h1">Scanner de <em>Folha IA</em></div>
+    <div class="sub">Foto → identifica a planta e diagnostica com precisão</div>
+  </div>
+  <div class="px" id="sc-form">
+    <input type="file" id="leaf-file" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden" onchange="onLeaf(event)">
+    <div class="camgrid">
+      <button type="button" class="cambtn cambg" onclick="openFile('camera')"><span class="cai">📷</span><span class="can">Câmera</span><span class="cas">Tirar foto</span></button>
+      <button type="button" class="cambtn cambg2" onclick="openFile('gallery')"><span class="cai">🖼️</span><span class="can">Galeria</span><span class="cas">Escolher foto</span></button>
+    </div>
+    <div id="prev-wrap" style="display:none"><img id="prev-img" src="" alt="preview"></div>
+    <div class="fg">
+      <label class="fl">Qual planta? (busca ou deixe em branco)</label>
+      <div class="sw"><input type="text" class="fi" id="sc-ps" placeholder="Ex: ameixa, jabuticaba, roseira..." oninput="SP(this.value,'sc-pr','sc-pv')"><button class="sc" id="sc-pc" onclick="CS('sc-ps','sc-pr','sc-pv')">✕</button></div>
+      <div class="sr" id="sc-pr"></div><input type="hidden" id="sc-pv">
+    </div>
+    <div class="fg">
+      <label class="fl">Sintomas (opcional)</label>
+      <div class="chips" id="sc-chips">
+        <div class="chip" onclick="TC(this)">Manchas amarelas</div>
+        <div class="chip" onclick="TC(this)">Manchas marrons</div>
+        <div class="chip" onclick="TC(this)">Pó branco</div>
+        <div class="chip" onclick="TC(this)">Bordas secas</div>
+        <div class="chip" onclick="TC(this)">Folhas enroladas</div>
+        <div class="chip" onclick="TC(this)">Pontos pretos</div>
+        <div class="chip" onclick="TC(this)">Amarelecimento</div>
+        <div class="chip" onclick="TC(this)">Insetos visíveis</div>
+        <div class="chip" onclick="TC(this)">Galhas/deformação</div>
+        <div class="chip" onclick="TC(this)">Murcha</div>
+      </div>
+    </div>
+    <button class="btn bp" onclick="runScan()">🔬 Analisar com IA</button>
+  </div>
+  <div class="px"><div id="sc-ld" style="display:none"><div class="ld"><div class="lr"></div><p>Analisando folha...<br><span style="font-size:.75rem;color:var(--t3)">Diagnóstico preciso em andamento</span></p></div></div></div>
+  <div class="px" id="sc-res"></div>
+</div>
+
+<!-- DOSAGEM -->
+<div id="s-dosagem" class="s">
+  <div class="tb"><button class="bk" onclick="GB()">← Voltar</button><div class="logo">⚗️ Dosagem</div><div style="width:55px"></div></div>
+  <div class="px">
+    <div class="h1">Calculadora de <em>Defensivos</em></div>
+    <div class="sub">Dose exata — orgânica e química</div>
+    <div class="fg"><label class="fl">Cultura (busca livre)</label>
+      <div class="sw"><input type="text" class="fi" id="do-ps" placeholder="Ex: tomate, roseira, ameixa..." oninput="SP(this.value,'do-pr','do-pv')"><button class="sc" id="do-pc" onclick="CS('do-ps','do-pr','do-pv')">✕</button></div>
+      <div class="sr" id="do-pr"></div><input type="hidden" id="do-pv">
+    </div>
+    <div class="fg"><label class="fl">Problema / Praga</label>
+      <select class="fs" id="do-prb">
+        <option value="">Selecione</option>
+        <option>Oídio (fungo branco)</option><option>Requeima / Míldio</option><option>Ferrugem</option>
+        <option>Pulgão</option><option>Ácaro</option><option>Broca</option><option>Mosca-branca</option>
+        <option>Trips</option><option>Nematoide</option><option>Antracnose</option><option>Cercospora</option>
+        <option>Cochonilha</option><option>Lagarta</option><option>Mancha-de-alternária</option>
+      </select>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Área</label><input type="number" class="fi" id="do-ar" placeholder="100"></div>
+      <div class="fg"><label class="fl">Unidade</label><select class="fs" id="do-un"><option>m²</option><option>ha</option><option>vasos</option></select></div>
+    </div>
+    <div class="fg"><label class="fl">Equipamento</label>
+      <select class="fs" id="do-eq">
+        <option>Regador / spray manual</option><option>Pulverizador costal</option>
+        <option>Pulverizador motorizado</option><option>Drone agrícola</option><option>Trator</option>
+      </select>
+    </div>
+    <button class="btn bp" id="do-btn" onclick="runDos()">⚗️ Calcular Dosagem</button>
+    <div id="do-ld" style="display:none"><div class="ld"><div class="lr"></div><p>Calculando...</p></div></div>
+    <div id="do-res"></div>
+  </div>
+</div>
+
+<!-- ALERTAS -->
+<div id="s-alertas" class="s">
+  <div class="tb"><button class="bk" onclick="GB()">← Voltar</button><div class="logo">🌩️ Alertas</div><div style="width:55px"></div></div>
+  <div class="px">
+    <div class="h1">Alertas <em style="color:var(--go2)">Climáticos</em></div>
+    <div class="sub">Previsão de pragas com base no clima da sua região</div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="cl">Condições atuais</div>
+      <div style="display:flex;gap:20px;margin-top:4px">
+        <div><div style="font-size:.7rem;color:var(--t3)">Temp.</div><div style="font-family:Fraunces,serif;font-size:1.4rem;font-weight:700;color:var(--w)">24°C</div></div>
+        <div><div style="font-size:.7rem;color:var(--t3)">Umidade</div><div style="font-family:Fraunces,serif;font-size:1.4rem;font-weight:700;color:var(--go2)">81%</div></div>
+        <div><div style="font-size:.7rem;color:var(--t3)">Chuva</div><div style="font-family:Fraunces,serif;font-size:1.4rem;font-weight:700">3d</div></div>
+        <div><div style="font-size:.7rem;color:var(--t3)">Lua</div><div style="font-family:Fraunces,serif;font-size:1.4rem;font-weight:700;color:var(--bl)">🌒</div></div>
+      </div>
+    </div>
+    <div class="ai"><div class="asv asr"></div><div><div class="an">🍄 Phytophthora / Requeima</div><div class="adb">UR 81% + 25-28°C por 3 dias = condição crítica. Afeta tomate e pimentão. Aplique preventivo imediatamente.</div></div></div>
+    <div class="ai"><div class="asv aso"></div><div><div class="an">🌫️ Oídio (Podosphaera)</div><div class="adb">Vento seco pós-chuva favorece oídio em roseiras. Monitore folhas novas.</div></div></div>
+    <div class="ai"><div class="asv aso"></div><div><div class="an">🐛 Lagarta do Cartucho</div><div class="adb">Pós-chuva com temperatura alta favorece Spodoptera. Monitore milho.</div></div></div>
+    <div class="ai"><div class="asv asg"></div><div><div class="an">✅ Ácaro — Baixo risco</div><div class="adb">Alta umidade reduz risco de ácaro-rajado esta semana.</div></div></div>
+    <div class="card" style="margin-top:4px">
+      <div class="cl">Recomendação IA</div>
+      <p style="font-size:.81rem;color:var(--t2);line-height:1.55">Priorize calda bordalesa ou Mancozeb 800 WP em tomateiro e roseiras nas próximas 24h.</p>
+      <div style="display:flex;gap:7px;margin-top:10px">
+        <button class="bsm bg-g" onclick="G('dosagem')">Dosagem Orgânica</button>
+        <button class="bsm bg-go" onclick="G('dosagem')">Dosagem Química</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDÁRIO -->
+<div id="s-calendario" class="s">
+  <div class="tb"><button class="bk" onclick="GB()">← Voltar</button><div class="logo">🗓️ Calendário</div><div style="width:55px"></div></div>
+  <div class="px">
+    <div class="h1">Calendário <em>Fenológico</em></div>
+    <div class="sub">Do plantio à colheita — passo a passo por fase</div>
+    <div id="cal-form">
+      <div class="fg"><label class="fl">Cultura (busca livre)</label>
+        <div class="sw"><input type="text" class="fi" id="ca-ps" placeholder="Ex: cerejeira, noz-pecã, morango..." oninput="SP(this.value,'ca-pr','ca-pv')"><button class="sc" id="ca-pc" onclick="CS('ca-ps','ca-pr','ca-pv')">✕</button></div>
+        <div class="sr" id="ca-pr"></div><input type="hidden" id="ca-pv">
+      </div>
+      <div class="fg"><label class="fl">Origem</label>
+        <div class="chips"><div class="chip on" id="co-s" onclick="selCO('semente',this)">🌱 Semente</div><div class="chip" id="co-m" onclick="selCO('muda',this)">🪴 Muda</div><div class="chip" id="co-e" onclick="selCO('enxerto',this)">🌿 Enxerto</div></div>
+      </div>
+      <div class="fg"><label class="fl">Local</label>
+        <div class="chips"><div class="chip on" id="cl-v" onclick="selCL('vaso',this)">🪴 Vaso</div><div class="chip" id="cl-q" onclick="selCL('quintal',this)">🏡 Quintal</div><div class="chip" id="cl-c" onclick="selCL('campo',this)">🌾 Campo</div><div class="chip" id="cl-e" onclick="selCL('estufa',this)">🏗️ Estufa</div></div>
+      </div>
+      <div class="fg"><label class="fl">Data de plantio</label><input type="date" class="fi" id="ca-dt"></div>
+      <button class="btn bp" id="ca-btn" onclick="runCal()">📅 Gerar Calendário</button>
+    </div>
+    <div id="ca-ld" style="display:none"><div class="ld"><div class="lr"></div><p>Gerando calendário...<br><span style="font-size:.73rem;color:var(--t3)">Aguarde alguns segundos</span></p></div></div>
+    <div id="ca-res"></div>
+  </div>
+</div>
+
+<!-- PERFIL -->
+<div id="s-perfil" class="s">
+  <div class="tb"><div class="logo">Agro<em>Engine</em></div><div style="width:55px"></div></div>
+  <div class="px">
+    <div class="ph"><div class="pav" id="pav">🌱</div><div class="pnm" id="pnm">Usuário</div><div class="pty" id="pty">Hobbista</div><div id="pftags" style="margin-top:7px"></div></div>
+    <div class="st"><h2>📊 Solo</h2></div>
+    <div class="soilrow"><div class="sp2 ok"><div class="spv">6.2</div><div class="spl">pH</div></div><div class="sp2 ok"><div class="spv">3.2%</div><div class="spl">M.O.</div></div><div class="sp2 wn"><div class="spv">Baixo</div><div class="spl">Fósforo</div></div><div class="sp2 ok"><div class="spv">72%</div><div class="spl">V%</div></div></div>
+    <div class="st"><h2>🌱 Minhas Plantas</h2><button class="bsm bg-g" onclick="togAP()">+ Adicionar</button></div>
+    <div class="card" id="apf">
+      <div class="cl">Nova Planta</div>
+      <div class="fg" style="margin-top:7px"><label class="fl">Buscar planta</label>
+        <div class="sw"><input type="text" class="fi" id="np-ps" placeholder="Ex: ameixa, cerejeira, noz-pecã..." oninput="SP(this.value,'np-pr','np-pv')"><button class="sc" id="np-pc" onclick="CS('np-ps','np-pr','np-pv')">✕</button></div>
+        <div class="sr" id="np-pr"></div><input type="hidden" id="np-pv">
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Origem</label><select class="fs" id="np-or"><option>Semente</option><option>Muda</option><option>Enxerto</option></select></div>
+        <div class="fg"><label class="fl">Local</label><select class="fs" id="np-lo"><option>Vaso</option><option>Quintal</option><option>Campo</option><option>Estufa</option></select></div>
+      </div>
+      <div style="display:flex;gap:7px"><button class="btn bp" onclick="addP()" style="margin-top:0">Adicionar</button><button class="btn bs" onclick="togAP()" style="margin-top:0;flex:.45">Cancelar</button></div>
+    </div>
+    <div id="pl"></div>
+  </div>
+</div>
+
+<!-- DIÁRIO -->
+<div id="s-diario" class="s">
+  <div class="tb"><button class="bk" onclick="GB()">← Voltar</button><div class="logo">📔 Diário</div><div style="width:55px"></div></div>
+  <div class="px">
+    <div class="h1">Diário do <em>Campo</em></div>
+    <div class="sub">Registre observações, problemas e conquistas</div>
+    <div class="card">
+      <div class="cl">Nova Anotação</div>
+      <textarea class="fi" id="di-tx" rows="3" placeholder="Ex: Roseira com manchas amarelas..." style="resize:none;margin-top:6px;font-family:'DM Sans',sans-serif"></textarea>
+      <div class="chips" id="di-ch" style="margin:8px 0">
+        <div class="chip" onclick="TC(this)">🌱 Plantio</div><div class="chip" onclick="TC(this)">💧 Rega</div>
+        <div class="chip" onclick="TC(this)">✂️ Poda</div><div class="chip" onclick="TC(this)">🐛 Praga</div>
+        <div class="chip" onclick="TC(this)">🍅 Colheita</div><div class="chip" onclick="TC(this)">💊 Adubação</div>
+      </div>
+      <button class="btn bp" onclick="saveDi()">💾 Salvar</button>
+    </div>
+    <div class="st"><h2>Histórico</h2></div>
+    <div id="di-list">
+      <div class="ditem"><div class="ddt">Hoje 08:30</div><div class="dtx">Calda bordalesa nas roseiras. Manchas brancas no terço inferior.</div></div>
+      <div class="ditem"><div class="ddt">Ontem 17:15</div><div class="dtx">Colhidos 320g de tomate cereja. Precisam de tutoramento reforçado.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BIOINSUMOS -->
+<div id="s-bioinsumos" class="s">
+  <div class="tb"><button class="bk" onclick="GB()">← Voltar</button><div class="logo">🫙 Bioinsumos</div><div style="width:55px"></div></div>
+  <div class="px">
+    <div class="h1">Bioinsumos <em>Caseiros</em></div>
+    <div class="sub">Caldas e receitas de baixo custo e alta eficácia</div>
+    <div class="rec" onclick="showRec('neem')"><div class="cl" style="color:var(--g)">🌿 Fungicida + Inseticida</div><strong style="color:var(--w);font-size:.93rem">Calda de Nim (Neem)</strong><p style="font-size:.79rem;color:var(--t2);margin-top:4px">Controla pulgão, mosca-branca, ácaros e fungos. ~R$ 8/L</p></div>
+    <div class="rec" onclick="showRec('bord')"><div class="cl" style="color:var(--bl)">🍄 Fungicida</div><strong style="color:var(--w);font-size:.93rem">Calda Bordalesa</strong><p style="font-size:.79rem;color:var(--t2);margin-top:4px">Phytophthora, oídio, antracnose. Certificável orgânico.</p></div>
+    <div class="rec" onclick="showRec('bic')"><div class="cl" style="color:var(--go2)">🌾 Oídio específico</div><strong style="color:var(--w);font-size:.93rem">Bicarbonato + Leite</strong><p style="font-size:.79rem;color:var(--t2);margin-top:4px">Eficaz contra oídio em roseiras. Resultado em 3 dias.</p></div>
+    <div class="rec" onclick="showRec('bok')"><div class="cl" style="color:var(--go)">🌱 Biofertilizante</div><strong style="color:var(--w);font-size:.93rem">Bokashi Líquido</strong><p style="font-size:.79rem;color:var(--t2);margin-top:4px">Melhora biologia do solo e crescimento radicular.</p></div>
+    <div id="rec-det" style="display:none"></div>
+  </div>
+</div>
+
+<!-- LAUDO DE SOLO -->
+<div id="s-laudosolo" class="s">
+  <div class="tb"><button class="bk" onclick="GB()">← Voltar</button><div class="logo">🧪 Solo</div><div style="width:55px"></div></div>
+  <div class="px">
+    <div class="h1">Laudo de <em>Solo IA</em></div>
+    <div class="sub">Foto do laudo ou valores manuais → plano de adubação</div>
+    <input type="file" id="laudo-file" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden" onchange="onLaudo(event)">
+    <div class="camgrid">
+      <button type="button" class="cambtn cambg" onclick="openFile2('camera')"><span class="cai">📷</span><span class="can">Fotografar Laudo</span><span class="cas">Câmera</span></button>
+      <button type="button" class="cambtn cambg2" onclick="openFile2('gallery')"><span class="cai">📄</span><span class="can">Da Galeria</span><span class="cas">Foto salva</span></button>
+    </div>
+    <div id="laudo-prev" style="display:none;margin-bottom:10px"><img id="laudo-img" style="width:100%;border-radius:10px;max-height:160px;object-fit:cover" src="" alt="laudo"><div style="font-size:.73rem;color:var(--g);text-align:center;margin-top:4px">✅ Laudo carregado</div></div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="cl">Valores do Laudo</div>
+      <div class="fr" style="margin-top:8px">
+        <div class="fg"><label class="fl">pH</label><input type="number" step="0.1" class="fi" id="ls-ph" placeholder="6.0"></div>
+        <div class="fg"><label class="fl">M.O. (%)</label><input type="number" step="0.1" class="fi" id="ls-mo" placeholder="3.0"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">P (mg/dm³)</label><input type="number" class="fi" id="ls-p" placeholder="12"></div>
+        <div class="fg"><label class="fl">K (cmolc)</label><input type="number" step="0.01" class="fi" id="ls-k" placeholder="0.18"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Ca (cmolc)</label><input type="number" step="0.1" class="fi" id="ls-ca" placeholder="3.5"></div>
+        <div class="fg"><label class="fl">Mg (cmolc)</label><input type="number" step="0.1" class="fi" id="ls-mg" placeholder="1.2"></div>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Cultura alvo (busca livre)</label>
+      <div class="sw"><input type="text" class="fi" id="ls-ps" placeholder="Ex: tomate, café, roseira..." oninput="SP(this.value,'ls-pr','ls-pv')"><button class="sc" id="ls-pc" onclick="CS('ls-ps','ls-pr','ls-pv')">✕</button></div>
+      <div class="sr" id="ls-pr"></div><input type="hidden" id="ls-pv">
+    </div>
+    <button class="btn bp" id="ls-btn" onclick="runSolo()">🧪 Gerar Plano de Adubação</button>
+    <div id="ls-ld" style="display:none"><div class="ld"><div class="lr"></div><p>Interpretando laudo...</p></div></div>
+    <div id="ls-res"></div>
+  </div>
+</div>
+
+<!-- HIDROPONIA -->
+<div id="s-hidro" class="s">
+  <div class="tb"><button class="bk" onclick="GB()">← Voltar</button><div class="logo">💧 Hidroponia</div><div style="width:55px"></div></div>
+  <div class="px">
+    <div class="h1">Hidroponia &amp; <em style="color:var(--bl)">Ambiente Controlado</em></div>
+    <div class="sub">Configure seu sistema e receba solução nutritiva personalizada</div>
+    <div class="fg"><label class="fl">Sistema</label>
+      <div class="hsc" id="hi-sys">
+        <div class="chip" onclick="selHS(this,'NFT')">💧 NFT — Nutrient Film Technique</div>
+        <div class="chip" onclick="selHS(this,'DWC')">🫧 DWC — Deep Water Culture</div>
+        <div class="chip" onclick="selHS(this,'Substrato')">🪴 Substrato — vaso inerte</div>
+        <div class="chip" onclick="selHS(this,'Vertical')">🗼 Cultivo Vertical</div>
+        <div class="chip" onclick="selHS(this,'Aeroponia')">💨 Aeroponia</div>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Cultura (busca livre)</label>
+      <div class="sw"><input type="text" class="fi" id="hi-ps" placeholder="Ex: alface, manjericão, morango..." oninput="SP(this.value,'hi-pr','hi-pv')"><button class="sc" id="hi-pc" onclick="CS('hi-ps','hi-pr','hi-pv')">✕</button></div>
+      <div class="sr" id="hi-pr"></div><input type="hidden" id="hi-pv">
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Área (m²)</label><input type="number" step="0.1" class="fi" id="hi-ar" placeholder="2"></div>
+      <div class="fg"><label class="fl">Objetivo</label><select class="fs" id="hi-ob"><option>Consumo próprio</option><option>Venda local</option><option>Escala comercial</option></select></div>
+    </div>
+    <button class="btn bp" id="hi-btn" onclick="runHidro()">💧 Gerar Projeto</button>
+    <div id="hi-ld" style="display:none"><div class="ld"><div class="lr"></div><p>Gerando projeto...</p></div></div>
+    <div id="hi-res"></div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<!-- Install Banner -->
+<div id="install-banner" style="display:none;position:fixed;bottom:85px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:448px;background:var(--bg3);border:1px solid var(--g);border-radius:14px;padding:12px 14px;z-index:150;align-items:center;gap:10px">
+  <span style="font-size:1.4rem">📲</span>
+  <div style="flex:1"><div style="font-size:.82rem;font-weight:500;color:var(--w)">Instalar AgroEngine</div><div style="font-size:.7rem;color:var(--t2)">Adicionar à tela inicial — acesso offline</div></div>
+  <button onclick="installApp()" style="background:var(--g);color:var(--bg);border:none;border-radius:9px;padding:7px 14px;font-size:.78rem;font-weight:500;cursor:pointer">Instalar</button>
+  <button onclick="dismissInstall()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:1rem">✕</button>
+</div>
+
+<nav class="nb" id="nb" style="display:none">
+  <button class="ni on" id="n-home" onclick="G('home')"><span class="nic">🏡</span><span class="nil">INÍCIO</span></button>
+  <button class="ni" id="n-scanner" onclick="G('scanner')"><span class="nic">🔬</span><span class="nil">SCANNER</span></button>
+  <button class="ni" id="n-alertas" onclick="G('alertas')"><span class="nic">🌩️</span><span class="nil">ALERTAS</span></button>
+  <button class="ni" id="n-calendario" onclick="G('calendario')"><span class="nic">🗓️</span><span class="nil">CALENDÁRIO</span></button>
+  <button class="ni" id="n-perfil" onclick="G('perfil')"><span class="nic">🌿</span><span class="nil">PERFIL</span></button>
+</nav>
+
+<script>
+// ── STATE ──────────────────────────────────────
+var APP={type:'hobby',name:'',focuses:[],plants:[
+  {id:1,nm:'Tomate Cereja',sc:'Solanum lycopersicum',em:'🍅',or:'Semente',lo:'Vaso',ds:45,st:'ok'},
+  {id:2,nm:'Roseira Vermelha',sc:'Rosa sp.',em:'🌹',or:'Muda',lo:'Quintal',ds:120,st:'warn'},
+  {id:3,nm:'Limoeiro Tahiti',sc:'Citrus latifolia',em:'🍋',or:'Muda',lo:'Quintal',ds:365,st:'ok'}
+],nid:4,prev:'home',cur:'onb',img64:null,imgType:'image/jpeg',laudoB64:null,calOr:'semente',calLo:'vaso',hidroSys:''};
+
+var PL={hobby:'🏠 Hobbista',flori:'🌸 Floricultor',peq:'🌿 Pequeno Agricultor',grande:'🚜 Fazendeiro'};
+var PE={hobby:'🌱',flori:'🌸',peq:'🌿',grande:'🚜'};
+var FL={frutas:'🍎 Frutíferas',horta:'🥬 Hortaliças',flores:'🌺 Flores',ervas:'🌿 Ervas',saf:'🌳 Agrofloresta',hidro:'💧 Hidroponia'};
+
+// ── PLANT DB (compact) ─────────────────────────
+var PDB=[
+  {n:'Tomate Cereja',s:'Solanum lycopersicum',e:'🍅',f:'Solanácea'},
+  {n:'Roseira',s:'Rosa sp.',e:'🌹',f:'Rosácea'},
+  {n:'Limoeiro Tahiti',s:'Citrus latifolia',e:'🍋',f:'Rutácea'},
+  {n:'Laranjeira',s:'Citrus sinensis',e:'🍊',f:'Rutácea'},
+  {n:'Ameixeira',s:'Prunus salicina',e:'🍑',f:'Rosácea'},
+  {n:'Cerejeira',s:'Prunus avium',e:'🍒',f:'Rosácea'},
+  {n:'Macieira',s:'Malus domestica',e:'🍎',f:'Rosácea'},
+  {n:'Pereira',s:'Pyrus communis',e:'🍐',f:'Rosácea'},
+  {n:'Noz-pecã',s:'Carya illinoinensis',e:'🥜',f:'Juglandácea'},
+  {n:'Jabuticabeira',s:'Plinia cauliflora',e:'🫐',f:'Mirtácea'},
+  {n:'Goiabeira',s:'Psidium guajava',e:'🍈',f:'Mirtácea'},
+  {n:'Morangueiro',s:'Fragaria ananassa',e:'🍓',f:'Rosácea'},
+  {n:'Mangueira',s:'Mangifera indica',e:'🥭',f:'Anacardiácea'},
+  {n:'Abacateiro',s:'Persea americana',e:'🥑',f:'Laurácea'},
+  {n:'Bananeira',s:'Musa sp.',e:'🍌',f:'Musácea'},
+  {n:'Mamoeiro',s:'Carica papaya',e:'🧡',f:'Caricácea'},
+  {n:'Pitangueira',s:'Eugenia uniflora',e:'🍒',f:'Mirtácea'},
+  {n:'Pimentão',s:'Capsicum annuum',e:'🫑',f:'Solanácea'},
+  {n:'Pimenta-dedo-de-moça',s:'Capsicum baccatum',e:'🌶️',f:'Solanácea'},
+  {n:'Berinjela',s:'Solanum melongena',e:'🍆',f:'Solanácea'},
+  {n:'Alface',s:'Lactuca sativa',e:'🥬',f:'Asterácea'},
+  {n:'Rúcula',s:'Eruca sativa',e:'🌿',f:'Brasicácea'},
+  {n:'Couve',s:'Brassica oleracea',e:'🥦',f:'Brasicácea'},
+  {n:'Cenoura',s:'Daucus carota',e:'🥕',f:'Apiácea'},
+  {n:'Beterraba',s:'Beta vulgaris',e:'🔴',f:'Amarantácea'},
+  {n:'Cebola',s:'Allium cepa',e:'🧅',f:'Aliácea'},
+  {n:'Alho',s:'Allium sativum',e:'🧄',f:'Aliácea'},
+  {n:'Pepino',s:'Cucumis sativus',e:'🥒',f:'Cucurbitácea'},
+  {n:'Abobrinha',s:'Cucurbita pepo',e:'🫛',f:'Cucurbitácea'},
+  {n:'Manjericão',s:'Ocimum basilicum',e:'🌿',f:'Lamiácea'},
+  {n:'Alecrim',s:'Salvia rosmarinus',e:'🌿',f:'Lamiácea'},
+  {n:'Hortelã',s:'Mentha sp.',e:'🌿',f:'Lamiácea'},
+  {n:'Boldo',s:'Plectranthus barbatus',e:'🌿',f:'Lamiácea'},
+  {n:'Lavanda',s:'Lavandula angustifolia',e:'💜',f:'Lamiácea'},
+  {n:'Camomila',s:'Matricaria chamomilla',e:'🌼',f:'Asterácea'},
+  {n:'Orquídea',s:'Orchidaceae sp.',e:'🌸',f:'Orquidácea'},
+  {n:'Hortênsia',s:'Hydrangea macrophylla',e:'💐',f:'Hortensiácea'},
+  {n:'Girassol',s:'Helianthus annuus',e:'🌻',f:'Asterácea'},
+  {n:'Antúrio',s:'Anthurium sp.',e:'🌺',f:'Arácea'},
+  {n:'Café Arábica',s:'Coffea arabica',e:'☕',f:'Rubiácea'},
+  {n:'Cacaueiro',s:'Theobroma cacao',e:'🍫',f:'Malvácea'},
+  {n:'Soja',s:'Glycine max',e:'🫘',f:'Fabácea'},
+  {n:'Milho',s:'Zea mays',e:'🌽',f:'Poácea'},
+  {n:'Feijão',s:'Phaseolus vulgaris',e:'🫘',f:'Fabácea'},
+  {n:'Mandioca',s:'Manihot esculenta',e:'🍠',f:'Euforbiácea'},
+  {n:'Batata',s:'Solanum tuberosum',e:'🥔',f:'Solanácea'},
+  {n:'Uva',s:'Vitis vinifera',e:'🍇',f:'Vitácea'},
+  {n:'Maracujá',s:'Passiflora edulis',e:'💛',f:'Passiflorácea'},
+  {n:'Pitaya',s:'Hylocereus undatus',e:'🔴',f:'Cactácea'},
+  {n:'Physalis',s:'Physalis peruviana',e:'🟡',f:'Solanácea'},
+  {n:'Gengibre',s:'Zingiber officinale',e:'🫚',f:'Zingiberácea'},
+  {n:'Capim-limão',s:'Cymbopogon citratus',e:'🌿',f:'Poácea'},
+  {n:'Açaí',s:'Euterpe oleracea',e:'🫐',f:'Arécácea'},
+  {n:'Pupunha',s:'Bactris gasipaes',e:'🌴',f:'Arécácea'},
+  {n:'Araucária',s:'Araucaria angustifolia',e:'🌲',f:'Araucariácea'}
+];
+
+// ── NAVIGATION ─────────────────────────────────
+function G(id){
+  APP.prev=APP.cur;
+  document.querySelectorAll('.s').forEach(function(e){e.classList.remove('on')});
+  document.getElementById('s-'+id).classList.add('on');
+  APP.cur=id;
+  document.querySelectorAll('.ni').forEach(function(e){e.classList.remove('on')});
+  var nv=document.getElementById('n-'+id);
+  if(nv) nv.classList.add('on');
+  window.scrollTo(0,0);
+}
+function GB(){G(APP.prev==='onb'?'home':APP.prev)}
+
+// ── ONBOARDING ──────────────────────────────────
+function selO(el,step){
+  el.parentNode.querySelectorAll('.oo').forEach(function(e){e.classList.remove('on')});
+  el.classList.add('on');
+  APP.type=el.getAttribute('data-v');
+  document.getElementById('b'+step).disabled=false;
+}
+function togF(el){
+  el.classList.toggle('on');
+  APP.focuses=[];
+  document.querySelectorAll('#fcs .oo.on').forEach(function(e){APP.focuses.push(e.getAttribute('data-v'))});
+  document.getElementById('b1').disabled=APP.focuses.length===0;
+}
+function goO(n){
+  document.querySelectorAll('.ost').forEach(function(e){e.classList.remove('on')});
+  document.getElementById('os'+n).classList.add('on');
+  for(var i=0;i<3;i++){var d=document.getElementById('d'+i);d.classList.remove('dn');if(i<n)d.classList.add('dn')}
+  window.scrollTo(0,0);
+}
+function chkN(){document.getElementById('b2').disabled=document.getElementById('uname').value.trim().length<2}
+function finO(){
+  APP.name=document.getElementById('uname').value.trim();
+  updProf();renderPlants();
+  document.getElementById('nb').style.display='flex';
+  G('home');
+  // Test connectivity silently on start
+  setTimeout(testConn, 1500);
+}
+function testConn(){
+  var xhr=new XMLHttpRequest();
+  xhr.open('HEAD','https://api.anthropic.com',true);
+  xhr.timeout=8000;
+  xhr.onload=function(){ /* connected */ };
+  xhr.onerror=function(){ toast('⚠️ Sem internet. Conecte-se para usar a IA.'); };
+  xhr.ontimeout=function(){ toast('⚠️ Conexão lenta detectada.'); };
+  try{ xhr.send(); }catch(e){}
+}
+function updProf(){
+  var fn=APP.name.split(' ')[0];
+  document.getElementById('hnm').innerHTML=fn+', <em>bom cultivo!</em>';
+  document.getElementById('hbdg').textContent=PL[APP.type]||'🌱';
+  document.getElementById('hav').textContent=PE[APP.type]||'🌱';
+  document.getElementById('pav').textContent=PE[APP.type]||'🌱';
+  document.getElementById('pnm').textContent=APP.name;
+  document.getElementById('pty').textContent=PL[APP.type]||'';
+  var th='',ph='';
+  APP.focuses.forEach(function(f){th+='<span class="htag">'+(FL[f]||f)+'</span>';ph+='<span class="htag">'+(FL[f]||f)+'</span>'});
+  document.getElementById('hftags').innerHTML=th;
+  document.getElementById('pftags').innerHTML=ph;
+}
+
+// ── PLANT SEARCH ────────────────────────────────
+function SP(q,rid,vid){
+  var res=document.getElementById(rid);
+  var clr=document.getElementById(rid.replace('-pr','-pc'));
+  if(clr) clr.style.display=q?'block':'none';
+  if(!q||q.length<2){res.classList.remove('on');return}
+  var ql=q.toLowerCase();
+  var hits=PDB.filter(function(p){return p.n.toLowerCase().indexOf(ql)>=0||p.s.toLowerCase().indexOf(ql)>=0||p.f.toLowerCase().indexOf(ql)>=0}).slice(0,7);
+  if(!hits.length){
+    res.innerHTML='<div class="si"><span style="font-size:1.1rem">🔍</span><div><div class="sn">Não encontrado</div><div class="ss">A IA usará "'+q+'" no diagnóstico</div></div></div>';
+    document.getElementById(vid).value=q;
+  } else {
+    res.innerHTML=hits.map(function(p){
+      return '<div class="si" onclick="selP(\''+p.n+'\',\''+p.e+'\',\''+rid+'\',\''+vid+'\')">'+'<span style="font-size:1.15rem">'+p.e+'</span><div><div class="sn">'+p.n+'</div><div class="ss">'+p.s+' · '+p.f+'</div></div></div>';
+    }).join('');
+  }
+  res.classList.add('on');
+}
+function selP(nm,em,rid,vid){
+  var sid=rid.replace('-pr','-ps');
+  document.getElementById(sid).value=em+' '+nm;
+  document.getElementById(vid).value=nm;
+  document.getElementById(rid).classList.remove('on');
+  toast(em+' '+nm+' selecionado');
+}
+function CS(sid,rid,vid){
+  document.getElementById(sid).value='';
+  document.getElementById(vid).value='';
+  document.getElementById(rid).classList.remove('on');
+  var clr=document.getElementById(rid.replace('-pr','-pc'));
+  if(clr) clr.style.display='none';
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.sw')&&!e.target.closest('.sr')){
+    document.querySelectorAll('.sr').forEach(function(r){r.classList.remove('on')});
+  }
+});
+
+// ── CHIPS ───────────────────────────────────────
+function TC(el){el.classList.toggle('on')}
+function GC(id){return Array.from(document.querySelectorAll('#'+id+' .chip.on')).map(function(c){return c.textContent.trim()}).join(', ')}
+
+// ── FILE INPUT — Moto G6 / Android compatible ──────
+function openFile(mode){
+  var inp=document.getElementById('leaf-file');
+  // Remove and re-add to force browser to re-register
+  if(mode==='camera'){
+    inp.setAttribute('capture','environment');
+    inp.setAttribute('accept','image/*');
+  } else {
+    inp.removeAttribute('capture');
+    inp.setAttribute('accept','image/*');
+  }
+  // Use 100ms delay for older Android WebView
+  setTimeout(function(){
+    try { inp.click(); }
+    catch(e) { toast('Toque direto na área de upload'); }
+  }, 100);
+}
+function openFile2(mode){
+  var inp=document.getElementById('laudo-file');
+  if(mode==='camera'){
+    inp.setAttribute('capture','environment');
+    inp.setAttribute('accept','image/*');
+  } else {
+    inp.removeAttribute('capture');
+    inp.setAttribute('accept','image/*');
+  }
+  setTimeout(function(){
+    try { inp.click(); }
+    catch(e) { toast('Toque direto na área de upload'); }
+  }, 100);
+}
+function onLeaf(e){
+  var f=e.target.files&&e.target.files[0];
+  if(!f) return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    APP.img64=ev.target.result.split(',')[1];
+    APP.imgType=f.type||'image/jpeg';
+    document.getElementById('prev-img').src=ev.target.result;
+    document.getElementById('prev-wrap').style.display='block';
+    toast('✅ Imagem carregada!');
+  };
+  r.readAsDataURL(f);
+}
+function onLaudo(e){
+  var f=e.target.files&&e.target.files[0];
+  if(!f) return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    APP.laudoB64=ev.target.result.split(',')[1];
+    document.getElementById('laudo-img').src=ev.target.result;
+    document.getElementById('laudo-prev').style.display='block';
+    toast('📄 Laudo carregado!');
+  };
+  r.readAsDataURL(f);
+}
+
+// ── API CALL HELPER — XMLHttpRequest (compatible with Android 7+ / content://) ──
+function callAPI(messages, maxTok) {
+  return new Promise(function(resolve, reject) {
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://api.anthropic.com/v1/messages', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.timeout = 60000; // 60s timeout for slow connections
+
+      xhr.onload = function() {
+        try {
+          if (xhr.status < 200 || xhr.status >= 300) {
+            reject(new Error('HTTP ' + xhr.status + ' — verifique conexão'));
+            return;
+          }
+          var d = JSON.parse(xhr.responseText);
+          if (d.error) { reject(new Error(d.error.message)); return; }
+          var txt = (d.content && d.content[0] && d.content[0].text) || '';
+          if (!txt) { reject(new Error('Resposta vazia da IA')); return; }
+          var m = txt.match(/\{[\s\S]*\}/);
+          if (!m) { reject(new Error('Formato inválido: ' + txt.slice(0,80))); return; }
+          resolve(JSON.parse(m[0]));
+        } catch(e) {
+          reject(new Error('Erro ao processar resposta: ' + e.message));
+        }
+      };
+
+      xhr.onerror = function() {
+        reject(new Error('Sem conexão com a internet. Verifique o Wi-Fi ou dados móveis.'));
+      };
+
+      xhr.ontimeout = function() {
+        reject(new Error('Tempo esgotado (60s). Conexão lenta — tente novamente.'));
+      };
+
+      var body = JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: maxTok || 1500,
+        messages: messages
+      });
+
+      xhr.send(body);
+    } catch(e) {
+      reject(new Error('Erro ao enviar requisição: ' + e.message));
+    }
+  });
+}
+
+// ── SCANNER ─────────────────────────────────────
+async function runScan(){
+  var plant=document.getElementById('sc-pv').value||document.getElementById('sc-ps').value.trim();
+  var syms=GC('sc-chips');
+  document.getElementById('sc-form').style.display='none';
+  document.getElementById('sc-ld').style.display='block';
+  document.getElementById('sc-res').innerHTML='';
+
+  var content=[];
+  if(APP.img64) content.push({type:'image',source:{type:'base64',media_type:APP.imgType,data:APP.img64}});
+
+  content.push({type:'text',text:
+    'Voce e o AgroEngine: Eng. Agronomo Senior com PhD em Fitossanidade.\n'+
+    'Planta: '+(plant||'identificar pela imagem')+'\n'+
+    'Sintomas: '+(syms||'analisar pela imagem')+'\n'+
+    'Imagem: '+(APP.img64?'SIM - analise com prioridade maxima':'NAO')+'\n\n'+
+    'INSTRUCOES:\n'+
+    '1. Analise criteriosamente: cor das manchas, padrao, halo, esporulacao, necrose, insetos\n'+
+    '2. Identifique o agente ESPECIFICO (genero especie): ex Phytophthora infestans, Botrytis cinerea\n'+
+    '3. Diferencie fungo/bacteria/praga/deficiencia/abiose com precisao\n'+
+    '4. CADA diagnostico deve ser UNICO e especifico para os sinais observados\n'+
+    '5. Se ha imagem, o diagnostico deve ser baseado NELA prioritariamente\n\n'+
+    'JSON sem markdown:\n'+
+    '{"planta":"nome popular e cientifico","familia":"familia botanica","conf_planta":"Alta|Media|Baixa",'+
+    '"diagnostico":"nome tecnico completo","nome_popular":"como o produtor conhece",'+
+    '"tipo":"fungo|praga|bacteriose|deficiencia_nutricional|abioticoSolar|abioticoAgua|viral|nematode|fisiologico",'+
+    '"conf_diag":"Alta|Media|Baixa","sinais":"o que voce observou especificamente",'+
+    '"descricao":"3 frases: o que e, como progride, que dano causa",'+
+    '"condicoes":"temperatura e umidade favoraveis",'+
+    '"organico":{"produto":"","ingrediente":"","dose":"","preparo":"","aplicacao":"","frequencia":"","eficacia":"Alta|Media"},'+
+    '"quimico":{"produto":"","ia":"","grupo":"","dose":"","aplicacao":"","ihc":"dias","epi":""},'+
+    '"alternativos":["segundo possivel","terceiro se houver"],'+
+    '"prevencao":"medidas preventivas especificas","urgencia":"imediata|3dias|monitorar",'+
+    '"obs":"informacao critica adicional ou deixe vazio"}'
+  });
+
+  try{
+    var r=await callAPI([{role:'user',content:content}],2000);
+    var urgC={imediata:'tr','3dias':'tgo',monitorar:'tg'};
+    var urgL={imediata:'⚡ URGENTE — agir hoje','3dias':'⚠️ Ação em 3 dias',monitorar:'👁 Monitorar'};
+    var tipoM={fungo:'🍄 Fungo',praga:'🐛 Praga',bacteriose:'🦠 Bactéria',deficiencia_nutricional:'💊 Deficiência',abioticoSolar:'☀️ Queimadura Solar',abioticoAgua:'💧 Hídrico',viral:'🔬 Vírus',nematode:'🪱 Nematoide',fisiologico:'⚙️ Fisiológico'};
+    var confC={Alta:'tg',Media:'tgo',Média:'tgo',Baixa:'tr'};
+    var uk=(r.urgencia||'monitorar');
+    var org=r.organico||{};var qui=r.quimico||{};
+    var alt=(r.alternativos||[]).filter(function(x){return x&&x.length>2});
+
+    var h='<div style="margin-top:6px">';
+    h+='<div class="card">';
+    h+='<div class="cl">🌿 Planta Identificada</div>';
+    h+='<div style="font-family:Fraunces,serif;font-size:1.15rem;font-weight:900;color:var(--w)">'+(r.planta||'—')+'</div>';
+    h+='<div style="font-size:.7rem;font-style:italic;color:var(--t3);margin-top:1px">'+(r.familia||'')+'</div>';
+    h+='<span class="tag '+(confC[r.conf_planta]||'tgo')+'" style="margin-top:6px">Identificação: '+(r.conf_planta||'—')+'</span>';
+    h+='</div>';
+    h+='<span class="tag '+(urgC[uk]||'tgo')+'">'+(urgL[uk]||'Monitorar')+'</span>';
+    h+='<span class="tag tb2">'+(tipoM[r.tipo]||r.tipo||'🔬')+'</span>';
+    h+='<div style="font-family:Fraunces,serif;font-size:1.1rem;font-weight:900;color:var(--w);margin:9px 0 2px">'+(r.diagnostico||'—')+'</div>';
+    if(r.nome_popular) h+='<div style="font-size:.74rem;color:var(--t2);margin-bottom:5px">📌 Conhecido como: <strong>'+r.nome_popular+'</strong></div>';
+    h+='<span class="tag '+(confC[r.conf_diag]||'tgo')+'">Confiança: '+(r.conf_diag||'Média')+'</span>';
+    if(r.sinais) h+='<div style="background:rgba(74,144,217,.08);border:1px solid rgba(74,144,217,.2);border-radius:10px;padding:10px 12px;margin:9px 0"><div style="font-size:.63rem;color:var(--bl);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">🔍 Sinais Observados</div><p style="font-size:.8rem;color:var(--t);line-height:1.5">'+r.sinais+'</p></div>';
+    h+='<p style="font-size:.8rem;color:var(--t2);line-height:1.55;margin:7px 0 4px">'+(r.descricao||'')+'</p>';
+    if(r.condicoes) h+='<p style="font-size:.72rem;color:var(--t3);margin-bottom:11px">🌡️ '+r.condicoes+'</p>';
+    h+='<div class="dual">';
+    h+='<div class="rc rco"><div class="rcl">🌿 Orgânico</div><p><strong>'+(org.produto||'—')+'</strong>';
+    if(org.ingrediente) h+='<br><em style="font-size:.69rem;color:var(--t3)">'+org.ingrediente+'</em>';
+    if(org.dose) h+='<br>'+org.dose;
+    if(org.preparo) h+='<br><span style="font-size:.7rem;color:var(--t3)">'+org.preparo+'</span>';
+    if(org.aplicacao) h+='<br>'+org.aplicacao;
+    if(org.frequencia) h+='<br><em style="color:var(--t3);font-size:.69rem">'+org.frequencia+'</em>';
+    if(org.eficacia) h+='<br><span style="font-size:.67rem;color:var(--g)">Eficácia: '+org.eficacia+'</span>';
+    h+='</p></div>';
+    h+='<div class="rc rcq"><div class="rcl">⚗️ Químico</div><p><strong>'+(qui.produto||'—')+'</strong>';
+    if(qui.ia) h+='<br><em style="font-size:.69rem;color:var(--t3)">'+qui.ia+'</em>';
+    if(qui.grupo) h+='<br><span style="font-size:.67rem;color:var(--t3)">'+qui.grupo+'</span>';
+    if(qui.dose) h+='<br>'+qui.dose;
+    if(qui.aplicacao) h+='<br>'+qui.aplicacao;
+    h+='<br><em style="color:var(--re);font-size:.69rem">Car: '+(qui.ihc||'—')+'d · '+(qui.epi||'EPI')+'</em>';
+    h+='</p></div></div>';
+    if(alt.length) h+='<div class="dp"><h4>🔄 Também pode ser</h4><ul>'+alt.map(function(d){return'<li>'+d+'</li>'}).join('')+'</ul></div>';
+    if(r.prevencao) h+='<div class="dp" style="margin-top:9px"><h4>🛡️ Prevenção</h4><p>'+r.prevencao+'</p></div>';
+    if(r.obs) h+='<div style="background:rgba(201,148,58,.1);border:1px solid rgba(201,148,58,.25);border-radius:10px;padding:10px 12px;margin-top:9px"><div style="font-size:.63rem;color:var(--go2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">⚡ Atenção</div><p style="font-size:.79rem;color:var(--t);line-height:1.5">'+r.obs+'</p></div>';
+    h+='<button class="btn bs" onclick="resetScan()" style="margin-top:13px">🔬 Nova Análise</button></div>';
+    document.getElementById('sc-res').innerHTML=h;
+  } catch(err){
+    document.getElementById('sc-res').innerHTML='<div class="card"><div class="cl" style="color:var(--re)">⚠️ Erro no diagnóstico</div><p style="font-size:.81rem;color:var(--t2);line-height:1.6"><strong>Motivo:</strong> '+err.message+'<br><br>• Verifique conexão com internet<br>• Foto precisa ser clara e iluminada<br>• Informe o nome da planta<br>• Selecione sintomas observados</p></div><button class="btn bs" onclick="resetScan()">Tentar Novamente</button>';
+  }
+  document.getElementById('sc-ld').style.display='none';
+}
+function resetScan(){
+  document.getElementById('sc-form').style.display='block';
+  document.getElementById('sc-res').innerHTML='';
+  document.getElementById('prev-wrap').style.display='none';
+  APP.img64=null;
+  CS('sc-ps','sc-pr','sc-pv');
+  document.querySelectorAll('#sc-chips .chip').forEach(function(c){c.classList.remove('on')});
+}
+
+// ── DOSAGEM ─────────────────────────────────────
+async function runDos(){
+  var plant=document.getElementById('do-pv').value||document.getElementById('do-ps').value.trim();
+  var prob=document.getElementById('do-prb').value;
+  var area=document.getElementById('do-ar').value;
+  var un=document.getElementById('do-un').value;
+  var eq=document.getElementById('do-eq').value;
+  if(!plant||!prob||!area){toast('⚠️ Preencha cultura, problema e área');return}
+  var btn=document.getElementById('do-btn');
+  btn.disabled=true;btn.textContent='⏳ Calculando...';
+  document.getElementById('do-ld').style.display='block';
+  try{
+    var r=await callAPI([{role:'user',content:'AgroEngine calcula dosagem defensivo. Cultura:'+plant+' Problema:'+prob+' Area:'+area+' '+un+' Equip:'+eq+'. JSON sem markdown:{"problema":"","area_norm":"","organico":{"produto":"","dose":"","calda":"","custo":"R$","preparo":"","aplicacao":""},"quimico":{"produto":"","ia":"","dose":"","calda":"","custo":"R$","ihc":"","epi":""},"dica":""}'}],1200);
+    var og=r.organico||{};var qu=r.quimico||{};
+    document.getElementById('do-res').innerHTML='<div style="margin-top:11px"><div style="font-family:Fraunces,serif;font-size:1.05rem;font-weight:700;color:var(--w);margin-bottom:3px">'+r.problema+'</div><div style="font-size:.7rem;color:var(--t3);margin-bottom:11px">'+r.area_norm+'</div><div class="dual"><div class="rc rco"><div class="rcl">🌿 Orgânico</div><p><strong>'+(og.produto||'—')+'</strong><br>'+(og.dose||'')+'<br>Calda: '+(og.calda||'—')+'<br><strong>'+(og.custo||'')+'</strong><br><em style="font-size:.69rem;color:var(--t3)">'+(og.preparo||'')+'</em></p></div><div class="rc rcq"><div class="rcl">⚗️ Químico</div><p><strong>'+(qu.produto||'—')+'</strong><br>'+(qu.ia||'')+'<br>'+(qu.dose||'')+'<br><strong>'+(qu.custo||'')+'</strong><br><em style="font-size:.69rem;color:var(--re)">Car: '+(qu.ihc||'—')+'d · '+(qu.epi||'EPI')+'</em></p></div></div>'+(r.dica?'<div class="dp"><h4>💡 Dica</h4><p>'+r.dica+'</p></div>':'')+'<button class="btn bs" onclick="resetDos()">Novo Cálculo</button></div>';
+  } catch(err){
+    document.getElementById('do-res').innerHTML='<div class="card"><div class="cl" style="color:var(--re)">⚠️ Erro</div><p style="font-size:.81rem;color:var(--t2)">'+err.message+'</p></div><button class="btn bs" onclick="resetDos()">Tentar Novamente</button>';
+  }
+  document.getElementById('do-ld').style.display='none';
+  btn.disabled=false;btn.textContent='⚗️ Calcular Dosagem';
+}
+function resetDos(){document.getElementById('do-res').innerHTML='';CS('do-ps','do-pr','do-pv')}
+
+// ── CALENDÁRIO ──────────────────────────────────
+var calOr='semente',calLo='vaso';
+function selCO(v,el){calOr=v;['co-s','co-m','co-e'].forEach(function(i){document.getElementById(i).classList.remove('on')});el.classList.add('on')}
+function selCL(v,el){calLo=v;['cl-v','cl-q','cl-c','cl-e'].forEach(function(i){document.getElementById(i).classList.remove('on')});el.classList.add('on')}
+
+async function runCal(){
+  var plant=document.getElementById('ca-pv').value||document.getElementById('ca-ps').value.trim();
+  var dt=document.getElementById('ca-dt').value;
+  if(!plant){toast('⚠️ Selecione a cultura');return}
+  var btn=document.getElementById('ca-btn');
+  btn.disabled=true;btn.textContent='⏳ Gerando...';
+  document.getElementById('ca-ld').style.display='block';
+  document.getElementById('ca-res').innerHTML='';
+  try{
+    var r=await callAPI([{role:'user',content:'Voce e AgroEngine Eng. Agronomo Senior. Gere calendario fenologico COMPLETO. Cultura:'+plant+' Origem:'+calOr+' Local:'+calLo+' Data:'+(dt||'hoje')+'. Responda SOMENTE JSON valido sem markdown sem texto fora:{"cultura":"","ciclo_total":"","solo_ideal":"","espacamento":"","fases":[{"nome":"","semana":"","emoji":"","descricao":"","tarefas":["","",""],"alerta":""}],"dica_especial":""}. Minimo 6 fases especificas.'}],2000);
+    if(!r.fases||!r.fases.length) throw new Error('Sem fases no resultado');
+    var fh=r.fases.map(function(f){
+      return '<div class="ti"><div class="tw">'+(f.semana||'')+'</div><div class="tt"><strong style="color:var(--w)">'+(f.emoji||'🌱')+' '+(f.nome||'')+'</strong><br><span style="font-size:.76rem;color:var(--t2)">'+(f.descricao||'')+'</span><div class="dp" style="margin-top:7px"><h4>Tarefas</h4><ul>'+(f.tarefas||[]).map(function(t){return'<li>'+t+'</li>'}).join('')+'</ul>'+(f.alerta?'<p style="color:var(--go2);font-size:.74rem;margin-top:5px">⚠️ '+f.alerta+'</p>':'')+'</div></div></div>'
+    }).join('');
+    document.getElementById('ca-res').innerHTML='<div style="margin-top:13px"><div style="font-family:Fraunces,serif;font-size:1.15rem;font-weight:900;color:var(--w)">'+(r.cultura||plant)+'</div><div style="margin:7px 0 12px"><span class="tag tg">📅 '+(r.ciclo_total||'—')+'</span><span class="tag tgo">📐 '+(r.espacamento||'—')+'</span></div><div class="card" style="margin-bottom:12px"><div class="cl">Solo Ideal</div><p style="font-size:.81rem;color:var(--t2)">'+(r.solo_ideal||'—')+'</p></div><div style="font-family:Fraunces,serif;font-size:.95rem;font-weight:600;color:var(--w);margin-bottom:10px">Fases de Cultivo</div><div class="tl">'+fh+'</div><div class="dp"><h4>💡 Dica Especial</h4><p>'+(r.dica_especial||'—')+'</p></div><button class="btn bs" onclick="resetCal()">Novo Calendário</button></div>';
+  } catch(err){
+    document.getElementById('ca-res').innerHTML='<div class="card"><div class="cl" style="color:var(--re)">⚠️ Erro</div><p style="font-size:.81rem;color:var(--t2)">'+err.message+'<br><br>Verifique se o Wi-Fi ou dados móveis estão ativos e tente novamente.</p></div><button class="btn bs" onclick="resetCal()">Tentar Novamente</button>';
+  }
+  document.getElementById('ca-ld').style.display='none';
+  btn.disabled=false;btn.textContent='📅 Gerar Calendário';
+}
+function resetCal(){document.getElementById('ca-res').innerHTML='';CS('ca-ps','ca-pr','ca-pv');document.getElementById('ca-btn').disabled=false;document.getElementById('ca-btn').textContent='📅 Gerar Calendário'}
+
+// ── PERFIL / PLANTAS ────────────────────────────
+var CARE={
+  'Tomate Cereja':{cu:['Regar 2x/dia nos primeiros 30 dias','Tutorar com estaca a partir de 20cm','Adubação quinzenal NPK 10-10-10','Desbrota: remover brotos axilares'],al:'Risco de Phytophthora com chuva+calor'},
+  'Roseira Vermelha':{cu:['Poda após cada florada','Solo drenado pH 6–6,5','Calda de neem quinzenal preventivo','Evitar molhar folhas'],al:'⚠️ Monitorar oídio nas folhas novas'},
+  'Limoeiro Tahiti':{cu:['Irrigar 3x/semana no verão','Adubar com fertilizante citrícola','Podar galhos cruzados no inverno','Controlar pulgão com jato d\'água'],al:null}
+};
+function getCare(nm){
+  if(CARE[nm]) return CARE[nm];
+  var p=PDB.find(function(x){return x.n===nm});
+  return{cu:['Regar conforme necessidade da espécie','Solo bem drenado e rico em M.O.','Monitorar pragas e doenças','Adubação balanceada NPK mensalmente'+(p?' ('+p.f+')':'')],al:null};
+}
+function renderPlants(){
+  var el=document.getElementById('pl');
+  el.innerHTML='';
+  APP.plants.forEach(function(p){
+    var c=getCare(p.nm);
+    var d=document.createElement('div');
+    d.className='pi';d.id='pi'+p.id;
+    var stcls=p.st==='ok'?'pok':p.st==='warn'?'pwn':'pnw';
+    var stlbl=p.st==='ok'?'Saudável':p.st==='warn'?'Atenção':'Novo';
+    d.innerHTML='<button class="pdel" onclick="event.stopPropagation();delP('+p.id+')">✕</button>'+
+      '<div class="pe">'+(p.em||'🌿')+'</div>'+
+      '<div style="flex:1"><div class="pn">'+p.nm+'</div><div class="pd">'+(p.or||'')+(p.lo?' · '+p.lo:'')+(p.ds>0?' · Há '+p.ds+'d':'')+'</div></div>'+
+      '<span class="pst '+stcls+'">'+stlbl+'</span>'+
+      '<div class="pex">'+
+        (c.al?'<div style="font-size:.74rem;color:var(--go2);margin-bottom:7px">⚠️ '+c.al+'</div>':'')+
+        '<div class="dp"><h4>Cuidados</h4><ul>'+c.cu.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul></div>'+
+        '<div class="qa">'+
+          '<div class="qb" onclick="event.stopPropagation();prescan(\''+p.nm+'\')"><div class="qi">🔬</div><span class="ql">Diagnosticar</span></div>'+
+          '<div class="qb" onclick="event.stopPropagation();precal(\''+p.nm+'\')"><div class="qi">🗓️</div><span class="ql">Calendário</span></div>'+
+          '<div class="qb" onclick="event.stopPropagation();preanot(\''+p.nm+'\')"><div class="qi">📔</div><span class="ql">Anotar</span></div>'+
+        '</div>'+
+      '</div>';
+    d.addEventListener('click',function(){
+      var ex=d.classList.contains('ex');
+      document.querySelectorAll('.pi').forEach(function(e){e.classList.remove('ex')});
+      if(!ex) d.classList.add('ex');
+    });
+    el.appendChild(d);
+  });
+  document.getElementById('stp').textContent=APP.plants.length;
+}
+function togAP(){
+  var f=document.getElementById('apf');
+  f.style.display=f.style.display==='none'||!f.style.display?'block':'none';
+}
+function addP(){
+  var raw=document.getElementById('np-pv').value||document.getElementById('np-ps').value.trim();
+  var nm=raw.replace(/^[\S\s]{1,3}\s/,'').trim();
+  if(!nm){toast('⚠️ Busque e selecione uma planta');return}
+  var db=PDB.find(function(p){return p.n.toLowerCase()===nm.toLowerCase()});
+  APP.plants.push({id:APP.nid++,nm:db?db.n:nm,sc:db?db.s:'',em:db?db.e:'🌿',or:document.getElementById('np-or').value,lo:document.getElementById('np-lo').value,ds:0,st:'new'});
+  renderPlants();togAP();
+  CS('np-ps','np-pr','np-pv');
+  toast((db?db.e:'🌿')+' '+(db?db.n:nm)+' adicionado!');
+}
+function delP(id){
+  if(!confirm('Remover esta planta?')) return;
+  APP.plants=APP.plants.filter(function(p){return p.id!==id});
+  renderPlants();toast('Planta removida.');
+}
+function prescan(nm){document.getElementById('sc-ps').value='🔬 '+nm;document.getElementById('sc-pv').value=nm;G('scanner')}
+function precal(nm){document.getElementById('ca-ps').value='🗓️ '+nm;document.getElementById('ca-pv').value=nm;G('calendario')}
+function preanot(nm){document.getElementById('di-tx').value='['+nm+'] ';G('diario')}
+
+// ── DIÁRIO ──────────────────────────────────────
+function saveDi(){
+  var tx=document.getElementById('di-tx').value.trim();
+  if(!tx){toast('⚠️ Escreva algo');return}
+  var tags=GC('di-ch');
+  var el=document.createElement('div');el.className='ditem';
+  el.innerHTML='<div class="ddt">Agora</div><div class="dtx">'+tx+'</div>'+(tags?'<div style="margin-top:6px;font-size:.7rem;color:var(--t3)">'+tags+'</div>':'');
+  document.getElementById('di-list').prepend(el);
+  document.getElementById('di-tx').value='';
+  document.querySelectorAll('#di-ch .chip').forEach(function(c){c.classList.remove('on')});
+  toast('📔 Anotação salva!');
+}
+
+// ── BIOINSUMOS ──────────────────────────────────
+var RECS={
+  neem:{t:'Calda de Nim (Neem)',i:['10ml óleo de neem','3ml detergente neutro','1L de água morna'],m:'Emulsione o óleo com o detergente. Adicione água aos poucos mexendo sempre. Use imediatamente.',a:'Foliar, manhã ou tarde. Nunca ao sol forte.',f:'A cada 7–10 dias',c:'~R$ 6–10/L'},
+  bord:{t:'Calda Bordalesa 1%',i:['100g sulfato de cobre','100g cal virgem','10L de água'],m:'Dissolva cobre em 5L. Cal nos outros 5L. Misture cobre NA cal (nunca o contrário). pH 7.',a:'Pulverizar toda a planta. Não usar em calor acima de 30°C.',f:'A cada 15 dias',c:'~R$ 8/10L'},
+  bic:{t:'Bicarbonato + Leite',i:['10g bicarbonato de sódio','50ml leite desnatado','1L de água'],m:'Dissolva bicarbonato na água. Adicione o leite. Pode adicionar 5ml de neem.',a:'Frente e verso das folhas. Não aplicar se houver chuva em 6h.',f:'A cada 5–7 dias',c:'~R$ 1–2/L'},
+  bok:{t:'Bokashi Líquido',i:['200g de bokashi maduro','2L de água sem cloro','1 colher de melaço'],m:'Misture e deixe em repouso 24–48h tampado. Coe antes de usar.',a:'Diluir 1:50 na rega ou 1:20 na pulverização foliar leve.',f:'Semanalmente',c:'~R$ 2–4/2L'}
+};
+function showRec(k){
+  var r=RECS[k];if(!r)return;
+  document.getElementById('rec-det').style.display='block';
+  document.getElementById('rec-det').innerHTML='<div class="card"><strong style="color:var(--w);font-size:.95rem">'+r.t+'</strong><div class="dp" style="margin-top:10px"><h4>🧴 Ingredientes</h4><ul>'+r.i.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul></div><div class="dp" style="margin-top:8px"><h4>🔧 Preparo</h4><p>'+r.m+'</p></div><div class="dp" style="margin-top:8px"><h4>💧 Aplicação</h4><p>'+r.a+'</p></div><div style="margin-top:9px"><span class="tag tg">🔄 '+r.f+'</span> <span class="tag tgo">💰 '+r.c+'</span></div><button class="btn bs" onclick="document.getElementById(\'rec-det\').style.display=\'none\'">← Voltar</button></div>';
+  document.getElementById('rec-det').scrollIntoView({behavior:'smooth'});
+}
+
+// ── LAUDO DE SOLO ───────────────────────────────
+async function runSolo(){
+  var plant=document.getElementById('ls-pv').value||document.getElementById('ls-ps').value.trim();
+  if(!plant){toast('⚠️ Informe a cultura alvo');return}
+  var btn=document.getElementById('ls-btn');
+  btn.disabled=true;btn.textContent='⏳ Interpretando...';
+  document.getElementById('ls-ld').style.display='block';
+  var ph=document.getElementById('ls-ph').value;
+  var mo=document.getElementById('ls-mo').value;
+  var p=document.getElementById('ls-p').value;
+  var k=document.getElementById('ls-k').value;
+  var ca=document.getElementById('ls-ca').value;
+  var mg=document.getElementById('ls-mg').value;
+  var content=[];
+  if(APP.laudoB64) content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:APP.laudoB64}});
+  content.push({type:'text',text:'AgroEngine interpreta laudo de solo. Cultura:'+plant+' pH='+( ph||'ni')+' MO='+(mo||'ni')+'% P='+(p||'ni')+' K='+(k||'ni')+' Ca='+(ca||'ni')+' Mg='+(mg||'ni')+(APP.laudoB64?' Extraia valores da imagem se possivel.':'')+'. JSON sem markdown:{"interp":{"ph":{"v":"","st":"otimo|adequado|alto|baixo|critico"},"mo":{"st":"adequado|baixo|alto"},"p":{"st":"adequado|baixo|alto"},"k":{"st":"adequado|baixo|alto"},"ca_mg":{"st":"adequado|baixo"}},"vb":"0-100%","calagem":{"need":true,"dose":"","prod":""},"org":["rec1","rec2","rec3"],"quim":["rec1 com dose","rec2","rec3"],"micro":["rec"],"dica":"dica especifica para '+plant+'","alerta":"alerta importante ou vazio"}'});
+  try{
+    var r=await callAPI([{role:'user',content:content}],1200);
+    var cm={otimo:'tg',adequado:'tg',alto:'tgo',baixo:'tr',critico:'tr'};
+    var ip=r.interp||{};
+    var tags=Object.entries(ip).map(function(kv){var k=kv[0],v=kv[1];return'<span class="tag '+(cm[v.st]||'tgo')+'">'+(k.toUpperCase().replace('_',' '))+(v.v?': '+v.v:'')+' '+(v.st||'')+'</span>'}).join('');
+    var cal=r.calagem||{};
+    document.getElementById('ls-res').innerHTML='<div style="margin-top:13px"><div style="font-family:Fraunces,serif;font-size:1.1rem;font-weight:700;color:var(--w);margin-bottom:8px">Diagnóstico para '+plant+'</div><div style="margin-bottom:11px">'+tags+'<span class="tag tb2">V% ≈ '+(r.vb||'—')+'</span></div>'+(r.alerta?'<div style="background:rgba(217,87,87,.1);border:1px solid rgba(217,87,87,.22);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.8rem;color:var(--re)">⚠️ '+r.alerta+'</div>':'')+(cal.need&&cal.dose?'<div class="card" style="margin-bottom:10px"><div class="cl" style="color:var(--go2)">🪨 Calagem</div><p style="font-size:.8rem;color:var(--t2)"><strong>'+cal.dose+'</strong> de '+cal.prod+'</p></div>':'')+'<div class="dual"><div class="rc rco"><div class="rcl">🌿 Correção Orgânica</div><ul style="padding-left:13px">'+(r.org||[]).map(function(x){return'<li style="font-size:.76rem;color:var(--t);margin-bottom:3px">'+x+'</li>'}).join('')+'</ul></div><div class="rc rcq"><div class="rcl">⚗️ Correção Química</div><ul style="padding-left:13px">'+(r.quim||[]).map(function(x){return'<li style="font-size:.76rem;color:var(--t);margin-bottom:3px">'+x+'</li>'}).join('')+'</ul></div></div>'+(r.micro&&r.micro.length?'<div class="dp" style="margin-top:9px"><h4>🔬 Micronutrientes</h4><ul>'+(r.micro||[]).map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul></div>':'')+(r.dica?'<div class="dp" style="margin-top:9px"><h4>💡 Dica para '+plant+'</h4><p>'+r.dica+'</p></div>':'')+'<button class="btn bs" onclick="resetSolo()">Novo Laudo</button></div>';
+  } catch(err){
+    document.getElementById('ls-res').innerHTML='<div class="card"><div class="cl" style="color:var(--re)">⚠️ Erro</div><p style="font-size:.81rem;color:var(--t2)">'+err.message+'</p></div><button class="btn bs" onclick="resetSolo()">Tentar Novamente</button>';
+  }
+  document.getElementById('ls-ld').style.display='none';
+  btn.disabled=false;btn.textContent='🧪 Gerar Plano de Adubação';
+}
+function resetSolo(){document.getElementById('ls-res').innerHTML='';APP.laudoB64=null;document.getElementById('laudo-prev').style.display='none';CS('ls-ps','ls-pr','ls-pv')}
+
+// ── HIDROPONIA ──────────────────────────────────
+function selHS(el,sys){
+  document.querySelectorAll('#hi-sys .chip').forEach(function(c){c.classList.remove('on')});
+  el.classList.add('on');APP.hidroSys=sys;
+}
+async function runHidro(){
+  var plant=document.getElementById('hi-pv').value||document.getElementById('hi-ps').value.trim();
+  if(!APP.hidroSys){toast('Selecione o sistema');return}
+  if(!plant){toast('Selecione a cultura');return}
+  var btn=document.getElementById('hi-btn');
+  btn.disabled=true;btn.textContent='⏳ Gerando...';
+  document.getElementById('hi-ld').style.display='block';
+  var area=document.getElementById('hi-ar').value||'2';
+  var obj=document.getElementById('hi-ob').value;
+  try{
+    var r=await callAPI([{role:'user',content:'AgroEngine especialista em hidroponia. Sistema:'+APP.hidroSys+' Cultura:'+plant+' Area:'+area+'m2 Objetivo:'+obj+'. JSON sem markdown:{"sistema":"","cultura":"","densidade":"","ciclo":"","producao":"","custo":"R$","roi":"meses","sol":{"ph":"","ec":"","nuts":[{"nm":"","dose":"","fn":""}]},"substrato":"","temp":"","luz":"","equip":[""],"passos":["","","","",""],"pragas":[""],"dica":""}'}],1800);
+    var sol=r.sol||{};
+    document.getElementById('hi-res').innerHTML='<div style="margin-top:13px"><div style="font-family:Fraunces,serif;font-size:1.1rem;font-weight:700;color:var(--w);margin-bottom:7px">'+(r.cultura||plant)+' — '+(r.sistema||APP.hidroSys)+'</div><div style="margin-bottom:12px"><span class="tag tg">🌱 '+(r.densidade||'—')+'</span> <span class="tag tgo">📅 '+(r.ciclo||'—')+'</span> <span class="tag tb2">📦 '+(r.producao||'—')+'</span></div><div class="card" style="margin-bottom:10px"><div class="cl" style="color:var(--bl)">💧 Solução Nutritiva</div><div style="display:flex;gap:14px;margin-bottom:9px"><div><div style="font-size:.68rem;color:var(--t3)">pH</div><div style="font-family:Fraunces,serif;font-size:1.3rem;font-weight:700;color:var(--w)">'+(sol.ph||'—')+'</div></div><div><div style="font-size:.68rem;color:var(--t3)">EC (mS/cm)</div><div style="font-family:Fraunces,serif;font-size:1.3rem;font-weight:700;color:var(--go2)">'+(sol.ec||'—')+'</div></div></div>'+(sol.nuts||[]).map(function(n){return'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--br2)"><span style="font-size:.78rem;color:var(--w)">'+n.nm+'</span><span style="font-size:.75rem;color:var(--t2)">'+n.dose+' — '+n.fn+'</span></div>'}).join('')+'</div><div class="dual"><div class="rc rco"><div class="rcl">🏗️ Setup</div><p>Custo: <strong>'+(r.custo||'—')+'</strong><br>ROI: '+(r.roi||'—')+'<br>Substrato: '+(r.substrato||'—')+'<br>Temp: '+(r.temp||'—')+'<br>Luz: '+(r.luz||'—')+'</p></div><div class="rc rcq"><div class="rcl">🔧 Equipamentos</div><p>'+(r.equip||[]).map(function(e){return'• '+e}).join('<br>')+'</p></div></div><div class="dp" style="margin-top:9px"><h4>📋 Passo a Passo</h4><ul>'+(r.passos||[]).map(function(p,i){return'<li><strong>'+(i+1)+'.</strong> '+p+'</li>'}).join('')+'</ul></div>'+(r.pragas&&r.pragas.length?'<div class="dp" style="margin-top:9px"><h4>🐛 Pragas Comuns</h4><ul>'+(r.pragas||[]).map(function(p){return'<li>'+p+'</li>'}).join('')+'</ul></div>':'')+(r.dica?'<div class="dp" style="margin-top:9px"><h4>💡 Dica Exclusiva</h4><p>'+r.dica+'</p></div>':'')+'<button class="btn bs" onclick="resetHidro()">Novo Projeto</button></div>';
+  } catch(err){
+    document.getElementById('hi-res').innerHTML='<div class="card"><div class="cl" style="color:var(--re)">⚠️ Erro</div><p style="font-size:.81rem;color:var(--t2)">'+err.message+'</p></div><button class="btn bs" onclick="resetHidro()">Tentar Novamente</button>';
+  }
+  document.getElementById('hi-ld').style.display='none';
+  btn.disabled=false;btn.textContent='💧 Gerar Projeto';
+}
+function resetHidro(){document.getElementById('hi-res').innerHTML='';APP.hidroSys='';document.querySelectorAll('#hi-sys .chip').forEach(function(c){c.classList.remove('on')});CS('hi-ps','hi-pr','hi-pv')}
+
+// ── SERVICE WORKER REGISTRATION ────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function() { console.log('SW registered'); })
+      .catch(function() { /* SW not critical */ });
+  });
+}
+
+// ── PWA INSTALL PROMPT ─────────────────────────
+var deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show install banner after 3 seconds
+  setTimeout(showInstallBanner, 3000);
+});
+function showInstallBanner() {
+  var b = document.getElementById('install-banner');
+  if (b && deferredPrompt) b.style.display = 'flex';
+}
+function installApp() {
+  var b = document.getElementById('install-banner');
+  if (b) b.style.display = 'none';
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
+  }
+}
+function dismissInstall() {
+  var b = document.getElementById('install-banner');
+  if (b) b.style.display = 'none';
+}
+
+// ── TOAST ───────────────────────────────────────
+var _tt;
+function toast(msg){
+  var t=document.querySelector('.toast');
+  if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t)}
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(_tt);_tt=setTimeout(function(){t.style.display='none'},2800);
+}
+
+// Protocol detection removed — running on https://
+</script>
+</body>
+</html>

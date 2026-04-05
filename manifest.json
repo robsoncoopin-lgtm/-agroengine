@@ -1,0 +1,27 @@
+{
+  "name": "AgroEngine — Seu Agrônomo Digital",
+  "short_name": "AgroEngine",
+  "description": "Do vaso ao hectare — Scanner de doenças, Calendário fenológico, Calculadora de defensivos e muito mais.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E1A0F",
+  "theme_color": "#0E1A0F",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["agriculture", "health", "utilities"],
+  "screenshots": []
+}
